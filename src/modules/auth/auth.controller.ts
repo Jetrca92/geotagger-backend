@@ -10,12 +10,12 @@ export class AuthController {
 
   @Post('register')
   async register(@Body() dto: UserRegisterDto): Promise<UserDto> {
-    return this.authService.register(dto.username, dto.password)
+    return this.authService.register(dto)
   }
 
   @Post('login')
   async login(@Body() dto: UserLoginDto): Promise<{ access_token: string }> {
-    const user: UserDto = await this.authService.validateUser(dto.username, dto.password)
+    const user: UserDto = await this.authService.validateUser(dto.email, dto.password)
     return this.authService.login(user)
   }
 }

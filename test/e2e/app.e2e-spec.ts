@@ -27,21 +27,21 @@ describe('AppController (e2e)', () => {
   it('/auth/register (POST) should register new user', () => {
     return request(app.getHttpServer())
       .post('/auth/register')
-      .send({ username: 'newUser', password: 'test123' })
+      .send({ email: 'new@user.com', firstName: 'New', lastName: 'User', password: 'test123' })
       .expect(201)
   })
 
   it('/auth/register (POST) should return error because user already exists', () => {
     return request(app.getHttpServer())
       .post('/auth/register')
-      .send({ username: 'newUser', password: 'test123' })
+      .send({ email: 'new@user.com', firstName: 'New', lastName: 'User', password: 'test123' })
       .expect(400)
   })
 
   it('/auth/login (POST) should return access_token', () => {
     return request(app.getHttpServer())
       .post('/auth/login')
-      .send({ username: 'newUser', password: 'test123' })
+      .send({ email: 'new@user.com', password: 'test123' })
       .expect(201)
       .then((res) => {
         userToken = res.body.access_token
@@ -51,7 +51,7 @@ describe('AppController (e2e)', () => {
   it('/auth/login (POST) should return error because of wrong password', () => {
     return request(app.getHttpServer())
       .post('/auth/login')
-      .send({ username: 'newUser', password: 'test111' })
+      .send({ email: 'new@user.com', password: 'test111' })
       .expect(400)
   })
 

@@ -1,9 +1,15 @@
-import { IsString } from 'class-validator'
+import { IsEmail, IsString } from 'class-validator'
 
 export class UserDto {
   @IsString()
   id: string
 
+  @IsEmail()
+  email: string
+
   @IsString()
-  username: string
+  firstName: string
+
+  @IsString()
+  lastName: string
 }
