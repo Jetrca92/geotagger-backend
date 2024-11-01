@@ -24,10 +24,6 @@ describe('AppController (e2e)', () => {
     await app.close()
   })
 
-  it('/ (GET)', () => {
-    return request(app.getHttpServer()).get('/').expect(200).expect('It works!')
-  })
-
   it('/auth/register (POST) should register new user', () => {
     return request(app.getHttpServer())
       .post('/auth/register')

@@ -8,11 +8,11 @@
   },
   "moduleDirectories": ["node_modules", "src"],
   "moduleNameMapper": {
+    "^common/(.*)$": "<rootDir>../src/common/$1",
     "^config/(.*)$": "<rootDir>../src/config/$1",
     "^decorators/(.*)$": "<rootDir>../src/decorators/$1",
-    "^entities/(.*)$": "<rootDir>../src/entities/$1",
-    "^helpers/(.*)$": "<rootDir>../src/helpers/$1",
     "^interfaces/(.*)$": "<rootDir>../src/interfaces/$1",
+    "^modules/(.*)$": "<rootDir>../src/modules/$1",
     "^utils/(.*)$": "<rootDir>../src/utils/$1"
   },
   "testPathIgnorePatterns": ["/node_modules/", "/dist/"]
