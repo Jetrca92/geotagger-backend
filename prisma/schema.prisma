@@ -55,19 +55,19 @@ model Location {
 }
 
 model Guess {
-  id        String   @id @default(uuid()) @db.Uuid
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                String   @id @default(uuid()) @db.Uuid
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
-  guessedLatitude Float
-  guessedLongitude Float
-  errorDistance Int
+  guessedLatitude   Float
+  guessedLongitude  Float
+  errorDistance     Int
 
-  ownerId String
-  owner   User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId           String   @db.Uuid
+  owner             User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
 
-  locationId String
-  location   Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  locationId        String   @db.Uuid
+  location          Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
 }
 
 model UserActionLog {
@@ -75,7 +75,7 @@ model UserActionLog {
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
 
-  userId         String
+  userId         String         @db.Uuid
   user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   action         UserActionType
