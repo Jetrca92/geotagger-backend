@@ -12,11 +12,11 @@
     "outDir": "dist",
     "baseUrl": "./src",
     "paths": {
+      "common/*": ["common/*"],
       "config/*": ["config/*"],
       "decorators/*": ["decorators/*"],
-      "entities/*": ["entities/*"],
-      "helpers/*": ["helpers/*"],
       "interfaces/*": ["interfaces/*"],
+      "modules/*": ["modules/*"],
       "utils/*": ["utils/*"]
     },
     "incremental": true,
