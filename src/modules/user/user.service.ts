@@ -1,7 +1,8 @@
 import { BadRequestException, Injectable, InternalServerErrorException, Logger } from '@nestjs/common'
 import { UserRegisterDto } from 'modules/auth/dto/user-register.dto'
-import { UserDto } from 'modules/auth/dto/user.dto'
+import { UserDto } from 'modules/user/dto/user.dto'
 import { DatabaseService } from 'modules/database/database.service'
+import { UpdateUserDto } from './dto/update-user.dto'
 
 @Injectable()
 export class UserService {
@@ -33,5 +34,27 @@ export class UserService {
       Logger.log(error)
       throw new InternalServerErrorException('Something went wrong while creating a new user.')
     }
+  }
+
+  async updateUser(id: string, updateUserDto: UpdateUserDto): Promise<UserDto> {
+    const user = (await this.prisma.user.findUnique({ where: { id } })) as UserDto
+    const updates: Partial<UserDto> = {}
+
+    if (user.email !== updateUserDto.email && updateUserDto.email) {
+      updates.email = updateUserDto.email
+    }
+
+    if (updateUserDto.firstName) updates.firstName = updateUserDto.firstName
+    if (updateUserDto.lastName) updates.lastName = updateUserDto.lastName
+
+    if (Object.keys(updates).length === 0) {
+      Logger.log('No fields to update')
+      throw new Error('No fields to update')
+    }
+
+    return this.prisma.user.update({
+      where: { id },
+      data: updates,
+    })
   }
 }
