@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
-import * as bcrypt from 'bcrypt'
+import * as bcrypt from 'utils/bcrypt'
 import { DatabaseService } from 'modules/database/database.service'
 import { JwtPayloadDto } from 'modules/auth/dto/jwt-payload.dto'
 import { UserDto } from '../user/dto/user.dto'
@@ -41,7 +41,7 @@ export class AuthService {
       throw new NotFoundException(`User with email ${email} not found`)
     }
 
-    const isMatch = await bcrypt.compare(password, user.password)
+    const isMatch = await bcrypt.compareHash(password, user.password)
 
     if (!isMatch) {
       throw new BadRequestException('Passwords do not match')
