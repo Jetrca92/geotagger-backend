@@ -12,4 +12,7 @@ export class UserDto {
 
   @IsString()
   lastName: string
+
+  @IsString()
+  avatarUrl?: string
 }

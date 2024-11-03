@@ -42,13 +42,21 @@ export class AuthService {
     }
 
     const isMatch = await bcrypt.compareHash(password, user.password)
-
     if (!isMatch) {
       throw new BadRequestException('Passwords do not match')
     }
 
     delete user.password // Remove password from the returned user
-
     return user
+  }
+
+  async validateGoogleUser(googleUser: UserRegisterDto) {
+    const user = await this.prisma.user.findUnique({ where: { email: googleUser.email } })
+    if (user) return user
+    const hashedPassword = await hash(googleUser.password, 10)
+    return this.userService.create({
+      ...googleUser,
+      password: hashedPassword,
+    })
   }
 }
