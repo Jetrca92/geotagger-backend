@@ -3,6 +3,7 @@ import { UserRegisterDto } from 'modules/auth/dto/user-register.dto'
 import { UserDto } from 'modules/user/dto/user.dto'
 import { DatabaseService } from 'modules/database/database.service'
 import { UpdateUserDto } from './dto/update-user.dto'
+import { UpdatePasswordDto } from './dto/update-password.dto'
 
 @Injectable()
 export class UserService {
@@ -25,6 +26,7 @@ export class UserService {
           password: createUserDto.password,
           firstName: createUserDto.firstName,
           lastName: createUserDto.lastName,
+          avatarUrl: createUserDto.avatarUrl,
         },
       })
 
@@ -49,12 +51,27 @@ export class UserService {
 
     if (Object.keys(updates).length === 0) {
       Logger.log('No fields to update')
-      throw new Error('No fields to update')
+      throw new BadRequestException('No fields to update')
     }
 
     return this.prisma.user.update({
       where: { id },
       data: updates,
     })
+  }
+
+  async updatePassword(id: string, updatePasswordDto: UpdatePasswordDto): Promise<UserDto> {
+    const user = (await this.prisma.user.findUnique({ where: { id } })) as UserDto
+    // compare pws
+    if (!updatePasswordDto.newPassword) {
+      Logger.log('New password must be provided')
+      throw new BadRequestException('New password must be provided')
+    }
+    if (updatePasswordDto.newPassword.length < 6) {
+      Logger.log('Password must be at least 6 characters long')
+      throw new BadRequestException('Password must be at least 6 characters long')
+    }
+    
+
   }
 }

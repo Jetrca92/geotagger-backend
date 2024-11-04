@@ -12,7 +12,7 @@ import { EmailService } from 'modules/email/email.service'
 @Injectable()
 export class AuthService {
   constructor(
-    private prisma: DatabaseService, // Use PrismaService instead of InjectRepository
+    private prisma: DatabaseService,
     private jwtService: JwtService,
     private userService: UserService,
     private emailService: EmailService,
@@ -62,12 +62,12 @@ export class AuthService {
     })
   }
 
-  async forgotPassword(email: string): Promise<void> {
-    const user = await this.prisma.user.findUnique({ where: { email } })
+  async forgotPassword(id: string): Promise<void> {
+    const user = await this.prisma.user.findUnique({ where: { id } })
     if (!user) {
-      Logger.log(`No user found for email: ${email}`)
-      throw new NotFoundException(`No user found for email: ${email}`)
+      Logger.log(`No user found with id: ${id}`)
+      throw new NotFoundException(`No user found for with id: ${id}`)
     }
-    await this.emailService.sendResetPasswordLink(email)
+    await this.emailService.sendResetPasswordLink(user.email)
   }
 }
