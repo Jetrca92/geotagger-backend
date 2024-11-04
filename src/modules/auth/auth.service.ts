@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common'
+import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import * as bcrypt from 'utils/bcrypt'
 import { DatabaseService } from 'modules/database/database.service'
@@ -7,6 +7,7 @@ import { UserDto } from '../user/dto/user.dto'
 import { UserRegisterDto } from './dto/user-register.dto'
 import { hash } from 'utils/bcrypt'
 import { UserService } from 'modules/user/user.service'
+import { EmailService } from 'modules/email/email.service'
 
 @Injectable()
 export class AuthService {
@@ -14,6 +15,7 @@ export class AuthService {
     private prisma: DatabaseService, // Use PrismaService instead of InjectRepository
     private jwtService: JwtService,
     private userService: UserService,
+    private emailService: EmailService,
   ) {}
 
   async register(dto: UserRegisterDto): Promise<UserDto> {
@@ -58,5 +60,14 @@ export class AuthService {
       ...googleUser,
       password: hashedPassword,
     })
+  }
+
+  async forgotPassword(email: string): Promise<void> {
+    const user = await this.prisma.user.findUnique({ where: { email } })
+    if (!user) {
+      Logger.log(`No user found for email: ${email}`)
+      throw new NotFoundException(`No user found for email: ${email}`)
+    }
+    await this.emailService.sendResetPasswordLink(email)
   }
 }
