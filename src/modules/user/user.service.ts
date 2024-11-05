@@ -50,6 +50,7 @@ export class UserService {
 
     if (updateUserDto.firstName) updates.firstName = updateUserDto.firstName
     if (updateUserDto.lastName) updates.lastName = updateUserDto.lastName
+    if (updateUserDto.avatarUrl) updates.avatarUrl = updateUserDto.avatarUrl
 
     if (Object.keys(updates).length === 0) {
       Logger.warn('No fields to update.')
