@@ -40,6 +40,7 @@ describe('UserService', () => {
       }
       const createdUser = {
         ...createUserDto,
+        avatarUrl: 'http://exapmle.com/avatar.jpg',
         id: '044740a9-2f5d-4e97-9afb-dc48f400164a',
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -63,6 +64,7 @@ describe('UserService', () => {
         password: 'password',
         firstName: 'John',
         lastName: 'Doe',
+        avatarUrl: 'http://exapmle.com/avatar.jpg',
         id: '044740a9-2f5d-4e97-9afb-dc48f400164a',
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -95,6 +97,7 @@ describe('UserService', () => {
         password: 'password',
         firstName: 'John',
         lastName: 'Doe',
+        avatarUrl: 'http://exapmle.com/avatar.jpg',
         id: '044740a9-2f5d-4e97-9afb-dc48f400164a',
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -116,6 +119,7 @@ describe('UserService', () => {
         password: 'password',
         firstName: 'John',
         lastName: 'Doe',
+        avatarUrl: 'http://exapmle.com/avatar.jpg',
         id: '044740a9-2f5d-4e97-9afb-dc48f400164a',
         createdAt: new Date(),
         updatedAt: new Date(),

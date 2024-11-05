@@ -16,6 +16,7 @@ import { GetCurrentUserById } from 'utils/get-user-by-id.decorator'
 import { UserDto } from './dto/user.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { UpdatePasswordDto } from './dto/update-password.dto'
 
 @ApiTags('user')
 @Controller('user')
@@ -57,7 +58,10 @@ export class UserController {
   @Patch('/update-password')
   @HttpCode(HttpStatus.OK)
   @UseInterceptors(ClassSerializerInterceptor)
-  async updatePassword(@Body() updateUserDto: UpdateUserDto, @GetCurrentUserById() userId: string): Promise<UserDto> {
-    return this.userService.updatePassword(userId, updateUserDto)
+  async updatePassword(
+    @Body() updatePasswordDto: UpdatePasswordDto,
+    @GetCurrentUserById() userId: string,
+  ): Promise<UserDto> {
+    return this.userService.updatePassword(userId, updatePasswordDto)
   }
 }
