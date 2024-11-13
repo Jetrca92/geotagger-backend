@@ -49,7 +49,7 @@ model Location {
 
   latitude  Float
   longitude Float
-  imageUrl  String?
+  imageUrl  String
   address   String
 
   ownerId   String   @db.Uuid
