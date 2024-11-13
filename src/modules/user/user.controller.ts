@@ -83,7 +83,7 @@ export class UserController {
   async findCurrentUser(@GetCurrentUserById() userId: string): Promise<UserDto> {
     return this.prisma.user.findUnique({
       where: { id: userId },
-      select: { id: true, email: true, firstName: true, lastName: true },
+      select: { id: true, email: true, firstName: true, lastName: true, avatarUrl: true, points: true },
     })
   }
 

@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-import { IsEmail, IsOptional, IsString, IsUUID } from 'class-validator'
+import { IsEmail, IsNumber, IsOptional, IsString, IsUUID } from 'class-validator'
 
 export class UserDto {
   @ApiProperty({
@@ -26,4 +26,8 @@ export class UserDto {
   @IsString()
   @IsOptional()
   avatarUrl?: string
+
+  @ApiProperty({ example: 10, description: 'Number of points' })
+  @IsNumber()
+  points: number
 }
