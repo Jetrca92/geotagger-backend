@@ -29,6 +29,14 @@ export class LocationController {
     })
   }
 
+  @ApiOperation({ summary: 'Return a random location' })
+  @ApiResponse({ status: 200, description: 'Random location', type: LocationDto })
+  @Get('')
+  @HttpCode(HttpStatus.OK)
+  async getRandomLocation(): Promise<LocationDto> {
+    return this.locationService.getRandomLocation()
+  }
+
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a new location' })
   @ApiResponse({ status: 201, description: 'Location successfully created' })

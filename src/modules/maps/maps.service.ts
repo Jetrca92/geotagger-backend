@@ -1,4 +1,4 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common'
+import { Injectable, HttpException, HttpStatus, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { HttpService } from '@nestjs/axios'
 import { firstValueFrom } from 'rxjs'
@@ -35,6 +35,7 @@ export class MapsService {
 
       throw new HttpException('No results found', HttpStatus.NOT_FOUND)
     } catch (error) {
+      Logger.error(error)
       throw new HttpException('Failed to fetch geocode', HttpStatus.SERVICE_UNAVAILABLE)
     }
   }

@@ -3,6 +3,7 @@ import {
   Injectable,
   InternalServerErrorException,
   Logger,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common'
 import { DatabaseService } from 'modules/database/database.service'
@@ -63,5 +64,28 @@ export class LocationService {
       data: updates,
       select: { latitude: true, longitude: true, imageUrl: true, address: true, ownerId: true },
     })
+  }
+
+  async getRandomLocation(): Promise<LocationDto> {
+    const count = await this.prisma.location.count()
+
+    if (count === 0) {
+      Logger.warn('No locations found')
+      throw new NotFoundException('No locations found')
+    }
+
+    const randomOffset = Math.floor(Math.random() * count)
+    const [location] = await this.prisma.location.findMany({
+      take: 1,
+      skip: randomOffset,
+    })
+
+    return {
+      latitude: location.latitude,
+      longitude: location.longitude,
+      imageUrl: location.imageUrl,
+      address: location.address,
+      ownerId: location.ownerId,
+    }
   }
 }
