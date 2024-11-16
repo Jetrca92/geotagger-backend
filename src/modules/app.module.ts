@@ -4,6 +4,7 @@ import { AuthModule } from './auth/auth.module'
 import { ConfigModule } from '@nestjs/config'
 import { EmailModule } from './email/email.module'
 import { UserModule } from './user/user.module'
+import { LocationModule } from './location/location.module'
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { UserModule } from './user/user.module'
     AuthModule,
     EmailModule,
     UserModule,
+    LocationModule,
   ],
   controllers: [],
   providers: [],

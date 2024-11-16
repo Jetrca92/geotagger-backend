@@ -1,22 +1,21 @@
 import { ApiProperty } from '@nestjs/swagger'
+import { Transform } from 'class-transformer'
 import { IsNumber, IsString, Max, Min } from 'class-validator'
 
 export class CreateLocationDto {
   @ApiProperty({ example: 46.258046, description: 'Latitude number' })
+  @Transform(({ value }) => parseFloat(value))
   @IsNumber()
-  @Min(-90)
-  @Max(90)
+  @Min(-90, { message: 'Latitude must be valid (at least -90)' })
+  @Max(90, { message: 'Latitude must be valit (cannot exceed 90)' })
   latitude: number
 
   @ApiProperty({ example: 15.121128, description: 'Longitude number' })
+  @Transform(({ value }) => parseFloat(value))
   @IsNumber()
-  @Min(-180)
-  @Max(180)
+  @Min(-180, { message: 'Longitude must be valid (at least -180)' })
+  @Max(180, { message: 'Longitude must be valid (cannot exceed 180)' })
   longitude: number
-
-  @ApiProperty({ example: 'https://example.com/image.jpg' })
-  @IsString()
-  imageUrl: string
 
   @ApiProperty({ example: 'Rimska cesta 94a', description: 'Location address' })
   @IsString()

@@ -16,14 +16,19 @@ export class LocationService {
   constructor(private readonly prisma: DatabaseService) {}
 
   async createLocation(locationDto: CreateLocationDto, userId: string): Promise<LocationDto> {
+    if (!userId) {
+      Logger.warn('UserId not provided while creating a new location')
+      throw new UnauthorizedException('User must be authenticated to create a new location')
+    }
     try {
       const newLocation = await this.prisma.location.create({
         data: {
           latitude: locationDto.latitude,
           longitude: locationDto.longitude,
-          imageUrl: locationDto.imageUrl,
           address: locationDto.address,
-          ownerId: userId,
+          owner: {
+            connect: { id: userId },
+          },
         },
       })
       Logger.log(`Location successfully created for user ${userId}`)
@@ -34,7 +39,7 @@ export class LocationService {
     }
   }
 
-  async updateLocation(userId: string, locationId: string, updateLocationDto: UpdateLocationDto): Promise<LocationDto> {
+  async updateLocation(locationId: string, userId: string, updateLocationDto: UpdateLocationDto): Promise<LocationDto> {
     const location = (await this.prisma.location.findUnique({ where: { id: locationId } })) as LocationDto
 
     if (!location) {
@@ -58,11 +63,11 @@ export class LocationService {
       throw new BadRequestException('No fields to update.')
     }
 
-    Logger.log(`Location updated successfully for location`)
+    Logger.log(`Location updated successfully.`)
     return this.prisma.location.update({
       where: { id: locationId },
       data: updates,
-      select: { latitude: true, longitude: true, imageUrl: true, address: true, ownerId: true },
+      select: { id: true, latitude: true, longitude: true, imageUrl: true, address: true, ownerId: true },
     })
   }
 
@@ -81,6 +86,7 @@ export class LocationService {
     })
 
     return {
+      id: location.id,
       latitude: location.latitude,
       longitude: location.longitude,
       imageUrl: location.imageUrl,
