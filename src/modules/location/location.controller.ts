@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -100,6 +101,15 @@ export class LocationController {
   }
 
   @ApiBearerAuth()
+  @ApiOperation({ summary: 'Delete location' })
+  @ApiResponse({ status: 200, description: 'Deleted location' })
+  @UseGuards(AuthGuard('jwt'))
+  @Delete('/:id')
+  async deleteLocation(@Param('id') locationId: string, @GetCurrentUserById() userId: string): Promise<LocationDto> {
+    return this.locationService.deleteLocation(userId, locationId)
+  }
+
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Upload file to S3' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -138,6 +148,6 @@ export class LocationController {
       throw new BadRequestException('File must be uploaded')
     }
     const imageUrl = await this.s3Service.uploadFile(file)
-    return this.locationService.updateLocation(locationId, userId, { imageUrl: imageUrl })
+    return this.locationService.updateLocation(userId, locationId, { imageUrl: imageUrl })
   }
 }
