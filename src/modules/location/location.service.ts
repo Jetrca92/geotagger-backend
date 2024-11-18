@@ -21,8 +21,8 @@ export class LocationService {
 
   async createLocation(locationDto: CreateLocationDto, userId: string): Promise<LocationDto> {
     if (!userId) {
-      Logger.warn('UserId not provided while creating a new location')
-      throw new UnauthorizedException('User must be authenticated to create a new location')
+      Logger.warn('UserId not provided while creating a new location.')
+      throw new UnauthorizedException('User must be authenticated to create a new location.')
     }
     try {
       const newLocation = await this.prisma.location.create({
@@ -39,7 +39,7 @@ export class LocationService {
       return newLocation as LocationDto
     } catch (error) {
       Logger.error(error)
-      throw new InternalServerErrorException('Failed to create location')
+      throw new InternalServerErrorException('Failed to create location.')
     }
   }
 
@@ -47,12 +47,12 @@ export class LocationService {
     const location = (await this.prisma.location.findUnique({ where: { id: locationId } })) as LocationDto
 
     if (!location) {
-      Logger.warn('Location not found')
-      throw new BadRequestException('Location not found')
+      Logger.warn('Location not found.')
+      throw new BadRequestException('Location not found.')
     }
 
     if (location.ownerId !== userId) {
-      Logger.warn('You are not the owner of location')
+      Logger.warn('You are not the owner of location.')
       throw new UnauthorizedException('You are not the owner.')
     }
 
@@ -68,7 +68,7 @@ export class LocationService {
           Logger.log(`Old image at ${location.imageUrl} deleted successfully.`)
         } catch (error) {
           Logger.error('Failed to delete old image from S3:', error.message)
-          throw new InternalServerErrorException('Failed to delete old image from S3')
+          throw new InternalServerErrorException('Failed to delete old image from S3.')
         }
       }
       updates.imageUrl = updateLocationDto.imageUrl
@@ -105,8 +105,8 @@ export class LocationService {
     const location = (await this.prisma.location.findUnique({ where: { id: locationId } })) as LocationDto
 
     if (!location) {
-      Logger.warn('Location not found')
-      throw new BadRequestException('Location not found')
+      Logger.warn('Location not found.')
+      throw new BadRequestException('Location not found.')
     }
 
     if (location.ownerId !== userId) {
@@ -120,7 +120,7 @@ export class LocationService {
           await this.s3Service.deleteFile(location.imageUrl)
         } catch (error) {
           Logger.error('Failed to delete file from S3:', error.message)
-          throw new InternalServerErrorException('Failed to delete location file from S3')
+          throw new InternalServerErrorException('Failed to delete location file from S3.')
         }
       }
 
@@ -136,8 +136,8 @@ export class LocationService {
     const count = await this.prisma.location.count()
 
     if (count === 0) {
-      Logger.warn('No locations found')
-      throw new NotFoundException('No locations found')
+      Logger.warn('No locations found.')
+      throw new NotFoundException('No locations found.')
     }
 
     const randomOffset = Math.floor(Math.random() * count)
