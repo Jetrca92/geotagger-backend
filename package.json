@@ -39,6 +39,7 @@
     "class-validator": "^0.14.1",
     "cross-env": "^7.0.3",
     "file-type": "^19.5.0",
+    "haversine-distance": "^1.2.3",
     "nodemailer": "^6.9.16",
     "passport-google-oauth20": "^2.0.0",
     "passport-jwt": "^4.0.1",

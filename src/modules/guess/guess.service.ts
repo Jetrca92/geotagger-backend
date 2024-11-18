@@ -6,15 +6,16 @@ import {
   UnauthorizedException,
 } from '@nestjs/common'
 import { DatabaseService } from 'modules/database/database.service'
-import { CreateGuessDto } from './dto/create-guess.dto'
 import { GuessDto } from './dto/guess.dto'
 import { LocationDto } from 'modules/location/dto/location.dto'
+import { calculateErrorDistance } from 'utils/calculateDistance'
+import { CreateLocationDto } from 'modules/location/dto/create-location.dto'
 
 @Injectable()
 export class GuessService {
   constructor(private readonly prisma: DatabaseService) {}
 
-  async createGuess(locationId: string, guessDto: CreateGuessDto, userId: string): Promise<GuessDto> {
+  async createGuess(locationId: string, guessDto: CreateLocationDto, userId: string): Promise<GuessDto> {
     if (!userId) {
       Logger.warn('UserId not provided while creating a new guess.')
       throw new UnauthorizedException('User must be authenticated to create a new location.')
@@ -32,17 +33,19 @@ export class GuessService {
       throw new BadRequestException('Location not found.')
     }
 
-    if (location.ownerId === userId) {
-      Logger.warn('User guessing on his location.')
-      throw new UnauthorizedException('You cant guess on your location.')
-    }
+    //if (location.ownerId === userId) {
+    //  Logger.warn('User guessing on his location.')
+    //  throw new UnauthorizedException('You cant guess on your location.')
+    //}
 
+    const errorDistance = calculateErrorDistance(location, guessDto)
     try {
       const newGuess = await this.prisma.guess.create({
         data: {
-          guessedLatitude: guessDto.guessedLatitude,
-          guessedLongitude: guessDto.guessedLongitude,
-          errorDistance: 5, //TODO,
+          guessedLatitude: guessDto.latitude,
+          guessedLongitude: guessDto.longitude,
+          address: guessDto.address,
+          errorDistance: errorDistance,
           owner: {
             connect: { id: userId },
           },

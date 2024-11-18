@@ -64,6 +64,7 @@ model Guess {
 
   guessedLatitude   Float
   guessedLongitude  Float
+  address           String
   errorDistance     Int
 
   ownerId           String   @db.Uuid

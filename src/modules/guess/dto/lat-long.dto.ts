@@ -8,12 +8,12 @@ export class LatLongDto {
   @IsNumber()
   @Min(-90, { message: 'Latitude must be valid (at least -90)' })
   @Max(90, { message: 'Latitude must be valit (cannot exceed 90)' })
-  latitude: number
+  lat: number
 
   @ApiProperty({ example: 15.121128, description: 'Longitude number' })
   @Transform(({ value }) => parseFloat(value))
   @IsNumber()
   @Min(-180, { message: 'Longitude must be valid (at least -180)' })
   @Max(180, { message: 'Longitude must be valid (cannot exceed 180)' })
-  longitude: number
+  lng: number
 }

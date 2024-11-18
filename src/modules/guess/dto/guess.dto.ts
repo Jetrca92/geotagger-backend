@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { Transform } from 'class-transformer'
-import { IsNumber, IsUUID, Max, Min } from 'class-validator'
+import { IsNumber, IsString, IsUUID, Max, Min } from 'class-validator'
 
 export class GuessDto {
   @ApiProperty({
@@ -24,6 +24,10 @@ export class GuessDto {
   @Min(-180, { message: 'Longitude must be valid (at least -180)' })
   @Max(180, { message: 'Longitude must be valid (cannot exceed 180)' })
   guessedLongitude: number
+
+  @ApiProperty({ example: 'Rimska cesta 94a', description: 'Location address' })
+  @IsString()
+  address: string
 
   @ApiProperty({ example: 502, description: 'Error distance in meters' })
   errorDistance: number
