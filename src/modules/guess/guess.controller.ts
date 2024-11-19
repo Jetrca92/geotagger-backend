@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Post, UseGuards } from '@nestjs/common'
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common'
 import { GuessService } from './guess.service'
 import { DatabaseService } from 'modules/database/database.service'
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
@@ -27,5 +27,14 @@ export class GuessController {
     @Body() guessDto: CreateLocationDto,
   ): Promise<GuessDto> {
     return this.guessService.createGuess(locationId, guessDto, userId)
+  }
+
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Return a list of guesses for specific location' })
+  @ApiResponse({ status: 200, description: 'List of latest guesses for specific location', type: GuessDto })
+  @UseGuards(AuthGuard('jwt'))
+  @Get('/:id')
+  async getGuesses(@Param('id') locationId: string): Promise<GuessDto[]> {
+    return this.guessService.getGuesses(locationId)
   }
 }

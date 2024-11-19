@@ -15,7 +15,5 @@ export const calculateErrorDistance = (location: LocationDto, guess: CreateLocat
   }
 
   const haversineMeters = haversine(locationCoordinates, guessCoordinates)
-  const haversineKilometers = haversineMeters / 1000
-  if (haversineMeters > 999) return haversineKilometers
   return haversineMeters
 }

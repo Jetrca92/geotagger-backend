@@ -1,15 +1,23 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { Transform } from 'class-transformer'
-import { IsNumber, IsString, IsUUID, Max, Min } from 'class-validator'
+import { IsDate, IsNumber, IsString, IsUUID, Max, Min } from 'class-validator'
+import { GuessOwnerDto } from './guess-owner.dto'
 
 export class GuessDto {
   @ApiProperty({
     example: '550e8400-e29b-41d4-a716-446655440000',
-    description: 'Unique identifier of the location',
+    description: 'Unique identifier of the guess',
     format: 'uuid',
   })
   @IsUUID()
   id: string
+
+  @ApiProperty({
+    example: 'date',
+    description: 'Date guess was created',
+  })
+  @IsDate()
+  createdAt: Date
 
   @ApiProperty({ example: 46.258046, description: 'Latitude number' })
   @Transform(({ value }) => parseFloat(value))
@@ -32,7 +40,13 @@ export class GuessDto {
   @ApiProperty({ example: 502, description: 'Error distance in meters' })
   errorDistance: number
 
+  @ApiProperty({
+    type: () => GuessOwnerDto,
+    description: 'Owner details of the guess',
+  })
+  owner: GuessOwnerDto
+
   @ApiProperty({ example: '550e8400-e29b-41d4-a716-446655440000', description: 'Owner ID of the user' })
   @IsUUID()
-  ownerId: string
+  locationId: string
 }

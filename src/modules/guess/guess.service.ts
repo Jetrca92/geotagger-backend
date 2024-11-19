@@ -3,6 +3,7 @@ import {
   Injectable,
   InternalServerErrorException,
   Logger,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common'
 import { DatabaseService } from 'modules/database/database.service'
@@ -33,10 +34,10 @@ export class GuessService {
       throw new BadRequestException('Location not found.')
     }
 
-    //if (location.ownerId === userId) {
-    //  Logger.warn('User guessing on his location.')
-    //  throw new UnauthorizedException('You cant guess on your location.')
-    //}
+    if (location.ownerId === userId) {
+      Logger.warn('User guessing on his location.')
+      throw new UnauthorizedException('You cant guess on your location.')
+    }
 
     const errorDistance = calculateErrorDistance(location, guessDto)
     try {
@@ -53,6 +54,16 @@ export class GuessService {
             connect: { id: locationId },
           },
         },
+        include: {
+          owner: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              avatarUrl: true,
+            },
+          },
+        },
       })
       Logger.log(`Guess successfully created for user ${userId} and location ${locationId}.`)
       return newGuess as GuessDto
@@ -60,5 +71,32 @@ export class GuessService {
       Logger.error(error)
       throw new InternalServerErrorException('Failed to create guess.')
     }
+  }
+
+  async getGuesses(locationId: string): Promise<GuessDto[]> {
+    const count = await this.prisma.guess.count()
+
+    if (count === 0) {
+      Logger.warn('No guesses found.')
+      throw new NotFoundException('No guesses found.')
+    }
+
+    return await this.prisma.guess.findMany({
+      where: { locationId },
+      orderBy: {
+        errorDistance: 'asc',
+      },
+      take: 13,
+      include: {
+        owner: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            avatarUrl: true,
+          },
+        },
+      },
+    })
   }
 }
