@@ -8,6 +8,7 @@ import {
   HttpStatus,
   Logger,
   Param,
+  ParseUUIDPipe,
   Patch,
   Post,
   UploadedFile,
@@ -18,7 +19,7 @@ import { MapsService } from 'modules/maps/maps.service'
 import { LocationService } from './location.service'
 import { GetCurrentUserById } from 'utils/get-user-by-id.decorator'
 import { CreateLocationDto } from './dto/create-location.dto'
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { LocationDto } from './dto/location.dto'
 import { DatabaseService } from 'modules/database/database.service'
 import { UpdateLocationDto } from './dto/update-location.dto'
@@ -87,13 +88,37 @@ export class LocationController {
     return this.locationService.createLocation(locationDto, userId)
   }
 
+  @ApiOperation({ summary: 'Return a location based on id' })
+  @ApiResponse({ status: 200, description: 'Location', type: LocationDto })
+  @ApiParam({
+    name: 'locationId',
+    description: 'The ID of the location',
+    type: String,
+    example: '123e4567-e89b-12d3-a456-426614174000',
+  })
+  @Get('/location/:locationId')
+  @HttpCode(HttpStatus.OK)
+  async getLocationById(@Param('locationId', ParseUUIDPipe) locationId: string): Promise<LocationDto> {
+    return this.prisma.location.findUnique({
+      where: {
+        id: locationId,
+      },
+    })
+  }
+
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update location information' })
   @ApiResponse({ status: 200, description: 'Updated location' })
+  @ApiParam({
+    name: 'locationId',
+    description: 'The ID of the location',
+    type: String,
+    example: '123e4567-e89b-12d3-a456-426614174000',
+  })
   @UseGuards(AuthGuard('jwt'))
-  @Patch('/:id')
+  @Patch('/location/:locationId')
   async updateLocation(
-    @Param('id') locationId: string,
+    @Param('locationId', ParseUUIDPipe) locationId: string,
     @GetCurrentUserById() userId: string,
     updateLocationDto: UpdateLocationDto,
   ): Promise<LocationDto> {
@@ -103,9 +128,18 @@ export class LocationController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete location' })
   @ApiResponse({ status: 200, description: 'Deleted location' })
+  @ApiParam({
+    name: 'locationId',
+    description: 'The ID of the location',
+    type: String,
+    example: '123e4567-e89b-12d3-a456-426614174000',
+  })
   @UseGuards(AuthGuard('jwt'))
-  @Delete('/:id')
-  async deleteLocation(@Param('id') locationId: string, @GetCurrentUserById() userId: string): Promise<LocationDto> {
+  @Delete('/location/:locationId')
+  async deleteLocation(
+    @Param('locationId', ParseUUIDPipe) locationId: string,
+    @GetCurrentUserById() userId: string,
+  ): Promise<LocationDto> {
     return this.locationService.deleteLocation(userId, locationId)
   }
 
@@ -123,8 +157,14 @@ export class LocationController {
       },
     },
   })
+  @ApiParam({
+    name: 'locationId',
+    description: 'The ID of the location',
+    type: String,
+    example: '123e4567-e89b-12d3-a456-426614174000',
+  })
   @UseGuards(AuthGuard('jwt'))
-  @Post('/upload/:id')
+  @Post('/upload/:locationId')
   @UseInterceptors(
     FileInterceptor('image', {
       storage: multer.memoryStorage(), // Store file in memory
@@ -140,7 +180,7 @@ export class LocationController {
   @HttpCode(HttpStatus.CREATED)
   async uploadImage(
     @UploadedFile() file: Express.Multer.File,
-    @Param('id') locationId: string,
+    @Param('locationId', ParseUUIDPipe) locationId: string,
     @GetCurrentUserById() userId: string,
   ): Promise<LocationDto> {
     if (!file) {
