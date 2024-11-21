@@ -6,10 +6,11 @@ import { LocationController } from './location.controller'
 import { MapsService } from 'modules/maps/maps.service'
 import { HttpModule } from '@nestjs/axios'
 import { S3Service } from 'modules/s3service/s3service.service'
+import { UserService } from 'modules/user/user.service'
 
 @Module({
   imports: [DatabaseModule, HttpModule],
-  providers: [LocationService, DatabaseService, MapsService, S3Service],
+  providers: [LocationService, DatabaseService, MapsService, S3Service, UserService],
   controllers: [LocationController],
 })
 export class LocationModule {}

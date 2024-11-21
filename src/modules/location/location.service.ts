@@ -11,11 +11,14 @@ import { CreateLocationDto } from './dto/create-location.dto'
 import { LocationDto } from './dto/location.dto'
 import { UpdateLocationDto } from './dto/update-location.dto'
 import { S3Service } from 'modules/s3service/s3service.service'
+import { UserService } from 'modules/user/user.service'
+import { points } from 'common/constants/points.constant'
 
 @Injectable()
 export class LocationService {
   constructor(
     private readonly prisma: DatabaseService,
+    private readonly userService: UserService,
     private s3Service: S3Service,
   ) {}
 
@@ -25,18 +28,25 @@ export class LocationService {
       throw new UnauthorizedException('User must be authenticated to create a new location.')
     }
     try {
-      const newLocation = await this.prisma.location.create({
-        data: {
-          latitude: locationDto.latitude,
-          longitude: locationDto.longitude,
-          address: locationDto.address,
-          owner: {
-            connect: { id: userId },
+      const result = await this.prisma.$transaction(async (prisma) => {
+        const newLocation = await prisma.location.create({
+          data: {
+            latitude: locationDto.latitude,
+            longitude: locationDto.longitude,
+            address: locationDto.address,
+            owner: {
+              connect: { id: userId },
+            },
           },
-        },
+        })
+
+        this.userService.updateUserPoints(points.UPLOAD_LOCATION, userId)
+
+        return newLocation
       })
+
       Logger.log(`Location successfully created for user ${userId}`)
-      return newLocation as LocationDto
+      return result as LocationDto
     } catch (error) {
       Logger.error(error)
       throw new InternalServerErrorException('Failed to create location.')

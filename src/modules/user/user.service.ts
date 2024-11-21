@@ -65,6 +65,15 @@ export class UserService {
     })
   }
 
+  async updateUserPoints(points: number, id: string): Promise<UserDto> {
+    return this.prisma.user.update({
+      where: { id },
+      data: {
+        points: { increment: points },
+      },
+    })
+  }
+
   async updatePassword(id: string, updatePasswordDto: UpdatePasswordDto): Promise<UserDto> {
     const user = await this.prisma.user.findUnique({ where: { id } })
     if (!user) {

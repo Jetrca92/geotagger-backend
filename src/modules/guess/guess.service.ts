@@ -11,10 +11,16 @@ import { GuessDto } from './dto/guess.dto'
 import { LocationDto } from 'modules/location/dto/location.dto'
 import { calculateErrorDistance } from 'utils/calculateDistance'
 import { CreateLocationDto } from 'modules/location/dto/create-location.dto'
+import { UserService } from 'modules/user/user.service'
+import { points } from 'common/constants/points.constant'
+import { UserDto } from 'modules/user/dto/user.dto'
 
 @Injectable()
 export class GuessService {
-  constructor(private readonly prisma: DatabaseService) {}
+  constructor(
+    private readonly prisma: DatabaseService,
+    private readonly userService: UserService,
+  ) {}
 
   async createGuess(locationId: string, guessDto: CreateLocationDto, userId: string): Promise<GuessDto> {
     if (!userId) {
@@ -28,10 +34,16 @@ export class GuessService {
     }
 
     const location = (await this.prisma.location.findUnique({ where: { id: locationId } })) as LocationDto
+    const user = (await this.prisma.user.findUnique({ where: { id: userId } })) as UserDto
 
     if (!location) {
-      Logger.warn('Location not found.')
+      Logger.warn('Location not found while creating a guess.')
       throw new BadRequestException('Location not found.')
+    }
+
+    if (!user) {
+      Logger.warn('User not found while creating a guess.')
+      throw new BadRequestException('User not found')
     }
 
     if (location.ownerId === userId) {
@@ -40,37 +52,61 @@ export class GuessService {
     }
 
     const errorDistance = calculateErrorDistance(location, guessDto)
+    const guessCount = await this.calculateGuessCount(locationId, userId)
+    const pointsToDeduct =
+      guessCount === 0 ? points.FIRST_GUESS : guessCount === 1 ? points.SECOND_GUESS : points.THIRD_GUESS
+
+    if (pointsToDeduct > user.points) {
+      Logger.warn('Insufficient points for a new guess')
+      throw new BadRequestException('Insufficient points for creating a new guess.')
+    }
+
     try {
-      const newGuess = await this.prisma.guess.create({
-        data: {
-          guessedLatitude: guessDto.latitude,
-          guessedLongitude: guessDto.longitude,
-          address: guessDto.address,
-          errorDistance: errorDistance,
-          owner: {
-            connect: { id: userId },
-          },
-          location: {
-            connect: { id: locationId },
-          },
-        },
-        include: {
-          owner: {
-            select: {
-              id: true,
-              firstName: true,
-              lastName: true,
-              avatarUrl: true,
+      const result = await this.prisma.$transaction(async (prisma) => {
+        const newGuess = await prisma.guess.create({
+          data: {
+            guessedLatitude: guessDto.latitude,
+            guessedLongitude: guessDto.longitude,
+            address: guessDto.address,
+            errorDistance: errorDistance,
+            owner: {
+              connect: { id: userId },
+            },
+            location: {
+              connect: { id: locationId },
             },
           },
-        },
+          include: {
+            owner: {
+              select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                avatarUrl: true,
+              },
+            },
+          },
+        })
+
+        this.userService.updateUserPoints(pointsToDeduct, userId)
+        return newGuess
       })
+
       Logger.log(`Guess successfully created for user ${userId} and location ${locationId}.`)
-      return newGuess as GuessDto
+      return result as GuessDto
     } catch (error) {
       Logger.error(error)
       throw new InternalServerErrorException('Failed to create guess.')
     }
+  }
+
+  private async calculateGuessCount(locationId: string, userId: string): Promise<number> {
+    return await this.prisma.guess.count({
+      where: {
+        locationId,
+        ownerId: userId,
+      },
+    })
   }
 
   async getGuesses(locationId: string): Promise<GuessDto[]> {
