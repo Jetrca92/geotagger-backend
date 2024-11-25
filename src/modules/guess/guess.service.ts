@@ -56,7 +56,7 @@ export class GuessService {
     const pointsToDeduct =
       guessCount === 0 ? points.FIRST_GUESS : guessCount === 1 ? points.SECOND_GUESS : points.THIRD_GUESS
 
-    if (pointsToDeduct > user.points) {
+    if (Math.abs(pointsToDeduct) > user.points) {
       Logger.warn('Insufficient points for a new guess')
       throw new BadRequestException('Insufficient points for creating a new guess.')
     }

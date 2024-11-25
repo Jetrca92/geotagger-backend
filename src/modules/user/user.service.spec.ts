@@ -4,6 +4,10 @@ import { DatabaseService } from 'modules/database/database.service'
 import { UserRegisterDto } from 'modules/auth/dto/user-register.dto'
 import { BadRequestException, InternalServerErrorException } from '@nestjs/common'
 import { UpdateUserDto } from './dto/update-user.dto'
+import { S3Service } from 'modules/s3service/s3service.service'
+import { EmailModule } from 'modules/email/email.module'
+import { ConfigModule, ConfigService } from '@nestjs/config'
+import { JwtService } from '@nestjs/jwt'
 
 describe('UserService', () => {
   let service: UserService
@@ -11,8 +15,11 @@ describe('UserService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      imports: [EmailModule, ConfigModule],
       providers: [
+        S3Service,
         UserService,
+        JwtService,
         {
           provide: DatabaseService,
           useValue: {
@@ -21,6 +28,12 @@ describe('UserService', () => {
               create: jest.fn(),
               update: jest.fn(),
             },
+          },
+        },
+        {
+          provide: ConfigService,
+          useValue: {
+            get: jest.fn().mockReturnValue('asf'),
           },
         },
       ],

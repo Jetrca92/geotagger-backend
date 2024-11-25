@@ -8,6 +8,8 @@ import * as bcrypt from 'utils/bcrypt'
 import { hash } from 'utils/bcrypt'
 import { UserDto } from 'modules/user/dto/user.dto'
 import { BadRequestException, NotFoundException } from '@nestjs/common'
+import { ConfigModule } from '@nestjs/config'
+import { EmailService } from 'modules/email/email.service'
 
 jest.mock('bcrypt')
 
@@ -32,12 +34,20 @@ describe('AuthService', () => {
       },
     }
 
+    const mockEmailService = {
+      user: {
+        findUnique: jest.fn(),
+      },
+    }
+
     const module: TestingModule = await Test.createTestingModule({
+      imports: [ConfigModule.forRoot()],
       providers: [
         AuthService,
         { provide: UserService, useValue: mockUserService },
         { provide: JwtService, useValue: mockJwtService },
         { provide: DatabaseService, useValue: mockDatabaseService },
+        { provide: EmailService, useValue: mockEmailService },
       ],
     }).compile()
 
@@ -58,11 +68,13 @@ describe('AuthService', () => {
       const hashedPassword = 'hashedPassword'
       const userId = '258ba836-5c34-4e46-bf6e-899a46b780de'
       jest.spyOn(bcrypt, 'hash').mockResolvedValue(hashedPassword)
-      jest.spyOn(userService, 'create').mockResolvedValue({ ...dto, id: userId, password: hashedPassword } as UserDto)
+      jest
+        .spyOn(userService, 'create')
+        .mockResolvedValue({ ...dto, id: userId, password: hashedPassword, points: 10 } as UserDto)
 
       const result = await authService.register(dto)
 
-      expect(result).toEqual({ ...dto, id: userId, password: hashedPassword })
+      expect(result).toEqual({ ...dto, id: userId, password: hashedPassword, points: 10 })
       expect(userService.create).toHaveBeenCalledWith({ ...dto, password: hashedPassword })
     })
   })
@@ -74,6 +86,7 @@ describe('AuthService', () => {
         email: 'test@example.com',
         firstName: 'Test',
         lastName: 'User',
+        points: 10,
       }
       const token = 'accessToken'
 

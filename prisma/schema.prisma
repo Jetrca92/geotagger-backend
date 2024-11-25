@@ -7,6 +7,60 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id        String          @id @default(uuid()) @db.Uuid
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  email     String          @unique
+  firstName String
+  lastName  String
+  password  String
+  points    Int             @default(10)
+  avatarUrl String?
+  guesses   Guess[]
+  locations Location[]
+  actions   UserActionLog[]
+}
+
+model Location {
+  id        String   @id @default(uuid()) @db.Uuid
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  latitude  Float
+  longitude Float
+  imageUrl  String?
+  address   String
+  ownerId   String   @db.Uuid
+  guesses   Guess[]
+  owner     User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+}
+
+model Guess {
+  id               String   @id @default(uuid()) @db.Uuid
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  guessedLatitude  Float
+  guessedLongitude Float
+  errorDistance    Int
+  ownerId          String   @db.Uuid
+  locationId       String   @db.Uuid
+  address          String
+  location         Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  owner            User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+}
+
+model UserActionLog {
+  id            String         @id @default(uuid()) @db.Uuid
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  userId        String         @db.Uuid
+  action        UserActionType
+  componentType ComponentType?
+  newValue      String?
+  location      String
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
 enum UserActionType {
   CLICK
   SCROLL
@@ -22,68 +76,5 @@ enum ComponentType {
   DROPDOWN
   CHECKBOX
   RADIO
-  NONE // for actions like scroll
-}
-
-model User {
-  id        String   @id @default(uuid()) @db.Uuid
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  email     String   @unique
-  firstName String
-  lastName  String
-  password  String
-  avatarUrl String?
-  points    Int      @default(10)
-
-  actions   UserActionLog[] // Relations to other models
-  locations Location[]
-  guesses   Guess[]
-}
-
-model Location {
-  id        String   @id @default(uuid()) @db.Uuid
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  latitude  Float
-  longitude Float
-  imageUrl  String?
-  address   String
-
-  ownerId   String   @db.Uuid
-  owner     User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  guesses   Guess[]
-}
-
-model Guess {
-  id                String   @id @default(uuid()) @db.Uuid
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-
-  guessedLatitude   Float
-  guessedLongitude  Float
-  address           String
-  errorDistance     Int
-
-  ownerId           String   @db.Uuid
-  owner             User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-
-  locationId        String   @db.Uuid
-  location          Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
-}
-
-model UserActionLog {
-  id             String         @id @default(uuid()) @db.Uuid
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
-
-  userId         String         @db.Uuid
-  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  action         UserActionType
-  componentType  ComponentType?
-  newValue       String?
-  location       String
+  NONE
 }

@@ -24,43 +24,63 @@ describe('AppController (e2e)', () => {
     await app.close()
   })
 
-  it('/auth/register (POST) should register new user', () => {
-    return request(app.getHttpServer())
-      .post('/auth/register')
-      .send({ email: 'new@user.com', firstName: 'New', lastName: 'User', password: 'test123' })
-      .expect(201)
-  })
-
-  it('/auth/register (POST) should return error because user already exists', () => {
-    return request(app.getHttpServer())
-      .post('/auth/register')
-      .send({ email: 'new@user.com', firstName: 'New', lastName: 'User', password: 'test123' })
-      .expect(400)
-  })
-
-  it('/auth/login (POST) should return access_token', () => {
-    return request(app.getHttpServer())
-      .post('/auth/login')
-      .send({ email: 'new@user.com', password: 'test123' })
-      .expect(201)
-      .then((res) => {
-        userToken = res.body.access_token
+  describe('Auth', () => {
+    describe('Register', () => {
+      it('/auth/register (POST) should register new user', () => {
+        return request(app.getHttpServer())
+          .post('/auth/register')
+          .send({ email: 'new@user.com', firstName: 'New', lastName: 'User', password: 'test123' })
+          .expect(201)
       })
-  })
 
-  it('/auth/login (POST) should return error because of wrong password', () => {
-    return request(app.getHttpServer())
-      .post('/auth/login')
-      .send({ email: 'new@user.com', password: 'test111' })
-      .expect(400)
+      it('/auth/register (POST) should return error because user already exists', () => {
+        return request(app.getHttpServer())
+          .post('/auth/register')
+          .send({ email: 'new@user.com', firstName: 'New', lastName: 'User', password: 'test123' })
+          .expect(400)
+      })
+    })
+
+    describe('Login', () => {
+      it('/auth/login (POST) should return access_token', () => {
+        return request(app.getHttpServer())
+          .post('/auth/login')
+          .send({ email: 'new@user.com', password: 'test123' })
+          .expect(201)
+          .then((res) => {
+            userToken = res.body.access_token
+          })
+      })
+
+      it('/auth/login (POST) should return error because of wrong password', () => {
+        return request(app.getHttpServer())
+          .post('/auth/login')
+          .send({ email: 'new@user.com', password: 'test111' })
+          .expect(400)
+      })
+    })
+
+    describe('Forgot password', () => {
+      it('/auth/forgot-password (POST) should send password reset mail', async () => {
+        return request(app.getHttpServer())
+          .post('/auth/forgot-password')
+          .set('Authorization', `Bearer ${userToken}`)
+          .expect(200)
+      })
+
+      it('/auth/forgot-password (POST) should return error if unauthorized', () => {
+        return request(app.getHttpServer()).post('/auth/forgot-password').expect(401)
+      })
+
+      it('/auth/forgot-password (POST) should return error if user does not exist', async () => {
+        const invalidToken = 'invalidToken123'
+        return request(app.getHttpServer())
+          .post('/auth/forgot-password')
+          .set('Authorization', `Bearer ${invalidToken}`)
+          .expect(404)
+      })
+    })
   })
 
   console.log(userToken)
-  // it('Example how to include jwt in request', () => {
-  //   return request(app.getHttpServer())
-  //     .post('/something')
-  //     .set('authorization', `Bearer ${userToken}`)
-  //     .expect(200)
-  //     .expect({ someData: true });
-  // });
 })
