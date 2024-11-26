@@ -9,6 +9,7 @@ import { EnvVars } from 'common/constants/env-vars.constant'
 @Module({
   imports: [
     DatabaseModule,
+    ConfigModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

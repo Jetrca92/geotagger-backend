@@ -27,15 +27,15 @@ export class UserService {
           password: createUserDto.password,
           firstName: createUserDto.firstName,
           lastName: createUserDto.lastName,
-          avatarUrl: createUserDto.avatarUrl,
+          avatarUrl: createUserDto.avatarUrl || null,
         },
       })
 
-      delete newUser.password
       Logger.log(`User successfully created for email ${createUserDto.email}`)
+      
       return newUser as UserDto
     } catch (error) {
-      Logger.error(error)
+      Logger.error('Error during user creation:', error.message, error.stack)
       throw new InternalServerErrorException('Something went wrong while creating a new user.')
     }
   }
