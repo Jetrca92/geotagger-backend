@@ -32,7 +32,7 @@ export class UserService {
       })
 
       Logger.log(`User successfully created for email ${createUserDto.email}`)
-      
+      delete newUser.password
       return newUser as UserDto
     } catch (error) {
       Logger.error('Error during user creation:', error.message, error.stack)

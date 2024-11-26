@@ -15,5 +15,6 @@
     "^modules/(.*)$": "<rootDir>../src/modules/$1",
     "^utils/(.*)$": "<rootDir>../src/utils/$1"
   },
-  "testPathIgnorePatterns": ["/node_modules/", "/dist/"]
+  "testPathIgnorePatterns": ["/node_modules/", "/dist/"],
+  "setupFiles": ["dotenv/config"]
 }

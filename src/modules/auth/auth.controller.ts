@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, UseGuards, Req, Res } from '@nestjs/common'
+import { Controller, Post, Body, Get, UseGuards, Req, Res, HttpCode, HttpStatus } from '@nestjs/common'
 import { AuthService } from './auth.service'
 import { UserLoginDto } from './dto/user-login.dto'
 import { UserDto } from '../user/dto/user.dto'
@@ -54,6 +54,7 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Password reset email sent.' })
   @ApiResponse({ status: 400, description: 'Invalid email address.' })
   @UseGuards(AuthGuard('jwt'))
+  @HttpCode(HttpStatus.OK)
   @Post('forgot-password')
   async forgotPassword(@GetCurrentUserById() userId: string): Promise<void> {
     return this.authService.forgotPassword(userId)
