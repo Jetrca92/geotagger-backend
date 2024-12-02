@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Body,
+  ClassSerializerInterceptor,
   Controller,
   Delete,
   Get,
@@ -61,6 +62,7 @@ export class LocationController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Return a list of users locations' })
   @ApiResponse({ status: 200, description: 'List of latest user locations', type: LocationDto })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   @UseGuards(AuthGuard('jwt'))
   @Get('/user-locations')
   @HttpCode(HttpStatus.OK)
@@ -79,8 +81,10 @@ export class LocationController {
   @ApiOperation({ summary: 'Create a new location' })
   @ApiResponse({ status: 201, description: 'Location successfully created' })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiResponse({ status: 400, description: 'Invalid input data.' })
   @UseGuards(AuthGuard('jwt'))
   @Post('')
+  @HttpCode(HttpStatus.CREATED)
   async addLocation(
     @GetCurrentUserById() userId: string,
     @Body() locationDto: CreateLocationDto,
@@ -90,6 +94,7 @@ export class LocationController {
 
   @ApiOperation({ summary: 'Return a location based on id' })
   @ApiResponse({ status: 200, description: 'Location', type: LocationDto })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
   @ApiParam({
     name: 'locationId',
     description: 'The ID of the location',
@@ -99,16 +104,13 @@ export class LocationController {
   @Get('/location/:locationId')
   @HttpCode(HttpStatus.OK)
   async getLocationById(@Param('locationId', ParseUUIDPipe) locationId: string): Promise<LocationDto> {
-    return this.prisma.location.findUnique({
-      where: {
-        id: locationId,
-      },
-    })
+    return this.locationService.getLocationById(locationId)
   }
 
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update location information' })
-  @ApiResponse({ status: 200, description: 'Updated location' })
+  @ApiResponse({ status: 200, description: 'Updated location', type: LocationDto })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiParam({
     name: 'locationId',
     description: 'The ID of the location',
@@ -117,10 +119,12 @@ export class LocationController {
   })
   @UseGuards(AuthGuard('jwt'))
   @Patch('/location/:locationId')
+  @HttpCode(HttpStatus.OK)
+  @UseInterceptors(ClassSerializerInterceptor)
   async updateLocation(
     @Param('locationId', ParseUUIDPipe) locationId: string,
     @GetCurrentUserById() userId: string,
-    updateLocationDto: UpdateLocationDto,
+    @Body() updateLocationDto: UpdateLocationDto,
   ): Promise<LocationDto> {
     return this.locationService.updateLocation(userId, locationId, updateLocationDto)
   }
@@ -128,6 +132,7 @@ export class LocationController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete location' })
   @ApiResponse({ status: 200, description: 'Deleted location' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiParam({
     name: 'locationId',
     description: 'The ID of the location',
@@ -136,6 +141,7 @@ export class LocationController {
   })
   @UseGuards(AuthGuard('jwt'))
   @Delete('/location/:locationId')
+  @HttpCode(HttpStatus.OK)
   async deleteLocation(
     @Param('locationId', ParseUUIDPipe) locationId: string,
     @GetCurrentUserById() userId: string,

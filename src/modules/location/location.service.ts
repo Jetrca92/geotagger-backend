@@ -53,12 +53,26 @@ export class LocationService {
     }
   }
 
+  async getLocationById(locationId: string): Promise<LocationDto> {
+    const location = (await this.prisma.location.findUnique({
+      where: {
+        id: locationId,
+      },
+    })) as LocationDto
+
+    if (!location) {
+      Logger.warn('Location not found.')
+      throw new NotFoundException('Location not found.')
+    }
+
+    return location
+  }
   async updateLocation(userId: string, locationId: string, updateLocationDto: UpdateLocationDto): Promise<LocationDto> {
     const location = (await this.prisma.location.findUnique({ where: { id: locationId } })) as LocationDto
 
     if (!location) {
       Logger.warn('Location not found.')
-      throw new BadRequestException('Location not found.')
+      throw new NotFoundException('Location not found.')
     }
 
     if (location.ownerId !== userId) {

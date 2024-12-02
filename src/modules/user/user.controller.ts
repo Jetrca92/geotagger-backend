@@ -37,6 +37,8 @@ export class UserController {
 
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Upload file to S3' })
+  @ApiResponse({ status: 200, description: 'The updated user', type: UserDto })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
@@ -76,6 +78,7 @@ export class UserController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get current user' })
   @ApiResponse({ status: 200, description: 'The current user', type: UserDto })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   @UseGuards(AuthGuard('jwt'))
   @Get()
   @HttpCode(HttpStatus.OK)
@@ -90,6 +93,7 @@ export class UserController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update current user information' })
   @ApiResponse({ status: 200, description: 'The updated user', type: UserDto })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   @UseGuards(AuthGuard('jwt'))
   @Patch('/update-user')
   @HttpCode(HttpStatus.OK)
@@ -101,6 +105,8 @@ export class UserController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update current user password' })
   @ApiResponse({ status: 200, description: 'The updated user', type: UserDto })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 400, description: 'Bad request' })
   @UseGuards(AuthGuard('jwt'))
   @Patch('/update-password')
   @HttpCode(HttpStatus.OK)

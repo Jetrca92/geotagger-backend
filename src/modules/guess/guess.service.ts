@@ -38,7 +38,7 @@ export class GuessService {
 
     if (!location) {
       Logger.warn('Location not found while creating a guess.')
-      throw new BadRequestException('Location not found.')
+      throw new NotFoundException('Location not found.')
     }
 
     if (!user) {
@@ -110,14 +110,7 @@ export class GuessService {
   }
 
   async getGuesses(locationId: string): Promise<GuessDto[]> {
-    const count = await this.prisma.guess.count()
-
-    if (count === 0) {
-      Logger.warn('No guesses found.')
-      throw new NotFoundException('No guesses found.')
-    }
-
-    return await this.prisma.guess.findMany({
+    const guesses = await this.prisma.guess.findMany({
       where: { locationId },
       orderBy: {
         errorDistance: 'asc',
@@ -134,5 +127,40 @@ export class GuessService {
         },
       },
     })
+
+    if (guesses.length === 0) {
+      Logger.warn('No guesses found.')
+      throw new NotFoundException('No guesses found.')
+    }
+
+    return guesses
+  }
+
+  async getUserGuesses(userId: string): Promise<GuessDto[]> {
+    const guesses = await this.prisma.guess.findMany({
+      where: {
+        ownerId: userId,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      include: {
+        owner: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            avatarUrl: true,
+          },
+        },
+      },
+    })
+
+    if (guesses.length === 0) {
+      Logger.warn('No guesses found.')
+      throw new NotFoundException('No guesses found.')
+    }
+
+    return guesses
   }
 }

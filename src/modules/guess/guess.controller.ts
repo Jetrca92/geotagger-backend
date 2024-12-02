@@ -18,28 +18,12 @@ export class GuessController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Return a list of users guesses' })
   @ApiResponse({ status: 200, description: 'List of latest user guesses', type: GuessDto })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   @UseGuards(AuthGuard('jwt'))
   @Get('/user-guesses')
   @HttpCode(HttpStatus.OK)
-  async getUserLocations(@GetCurrentUserById() userId: string): Promise<GuessDto[]> {
-    return this.prisma.guess.findMany({
-      where: {
-        ownerId: userId,
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-      include: {
-        owner: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            avatarUrl: true,
-          },
-        },
-      },
-    })
+  async getUserGuesses(@GetCurrentUserById() userId: string): Promise<GuessDto[]> {
+    return this.guessService.getUserGuesses(userId)
   }
 
   @ApiBearerAuth()
@@ -66,6 +50,7 @@ export class GuessController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Return a list of guesses for specific location' })
   @ApiResponse({ status: 200, description: 'List of latest guesses for specific location', type: GuessDto })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiParam({
     name: 'locationId',
     description: 'The ID of the location',
