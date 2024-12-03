@@ -46,7 +46,7 @@ export class AuthController {
   async googleCallback(@Req() req, @Res() res) {
     const { access_token } = await this.authService.login(req.user)
     const baseUrl = this.configService.get<string>(EnvVars.DATABASE_HOST)
-    return res.redirect(`http://${baseUrl}:8080/dashboard?token=${access_token}`)
+    return res.redirect(`http://${baseUrl}:3000/dashboard?token=${access_token}`)
   }
 
   @ApiBearerAuth()

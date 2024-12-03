@@ -110,6 +110,13 @@ export class GuessService {
   }
 
   async getGuesses(locationId: string): Promise<GuessDto[]> {
+    const location = await this.prisma.location.findUnique({
+      where: { id: locationId },
+    })
+    if (!location) {
+      Logger.error('No location found')
+      throw new NotFoundException('No location found')
+    }
     const guesses = await this.prisma.guess.findMany({
       where: { locationId },
       orderBy: {
@@ -130,7 +137,7 @@ export class GuessService {
 
     if (guesses.length === 0) {
       Logger.warn('No guesses found.')
-      throw new NotFoundException('No guesses found.')
+      return []
     }
 
     return guesses
@@ -158,7 +165,7 @@ export class GuessService {
 
     if (guesses.length === 0) {
       Logger.warn('No guesses found.')
-      throw new NotFoundException('No guesses found.')
+      return []
     }
 
     return guesses

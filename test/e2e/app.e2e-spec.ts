@@ -435,7 +435,6 @@ describe('AppController (e2e)', () => {
 
     describe('Create a guess', () => {
       it('/location/guess/:locationId (POST) should create a new guess', () => {
-        console.log(userToken)
         return request(app.getHttpServer())
           .post(`/location/guess/${uniqueLocationId}`)
           .set('Authorization', `Bearer ${userToken}`)
