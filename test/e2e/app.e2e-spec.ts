@@ -48,6 +48,7 @@ describe('AppController (e2e)', () => {
   })
 
   describe('Auth', () => {
+    let token: string
     afterAll(async () => {
       await databaseService.user.deleteMany()
     })
@@ -74,7 +75,7 @@ describe('AppController (e2e)', () => {
           .post('/auth/login')
           .send({ email: 'new@user.com', password: 'test123' })
           .expect(201)
-
+        token = res.body.access_token
         return res
       })
 
@@ -103,6 +104,28 @@ describe('AppController (e2e)', () => {
 
       it('/auth/forgot-password (POST) should return error if invalid dto', async () => {
         return request(app.getHttpServer()).post('/auth/forgot-password').send({ email: 'wronguser.com' }).expect(400)
+      })
+    })
+
+    describe('Reset password', () => {
+      it('/auth/reset-password (PATCH) should reset password', () => {
+        return request(app.getHttpServer())
+          .patch('/auth/reset-password')
+          .set('Authorization', `Bearer ${token}`)
+          .send({ newPassword: '123456' })
+          .expect(200)
+      })
+
+      it('/auth/reset-password (PATCH) should return error if unauthorized', () => {
+        return request(app.getHttpServer()).patch('/auth/reset-password').send({ newPassword: '123456' }).expect(401)
+      })
+
+      it('/auth/reset-password (PATCH) should return error if invalid dto', () => {
+        return request(app.getHttpServer())
+          .patch('/auth/reset-password')
+          .set('Authorization', `Bearer ${token}`)
+          .send({ newPassword: '12346' })
+          .expect(400)
       })
     })
   })

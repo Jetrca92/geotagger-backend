@@ -84,17 +84,9 @@ export class UserService {
       Logger.warn(`Incorrect current password for user ID ${id}.`)
       throw new BadRequestException('Incorrect current password')
     }
-    if (!updatePasswordDto.newPassword) {
-      Logger.warn('New password must be provided.')
-      throw new BadRequestException('New password must be provided.')
-    }
     if (updatePasswordDto.newPassword === updatePasswordDto.currentPassword) {
       Logger.warn('New password cannot be the same as the current password.')
       throw new BadRequestException('New password cannot be the same as the current password')
-    }
-    if (updatePasswordDto.newPassword.length < 6) {
-      Logger.warn('Password must be at least 6 characters long')
-      throw new BadRequestException('Password must be at least 6 characters long')
     }
     const hashedNewPassword = await bcrypt.hash(updatePasswordDto.newPassword)
     if (!hashedNewPassword) {
