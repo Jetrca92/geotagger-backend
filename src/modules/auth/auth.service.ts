@@ -79,7 +79,7 @@ export class AuthService {
       throw new NotFoundException(`No user found for with email: ${email}`)
     }
     Logger.log(`Sent password reset link to email ${email}`)
-    await this.emailService.sendResetPasswordLink(user.email)
+    await this.emailService.sendResetPasswordLink(user)
   }
 
   async resetPassword(id: string, resetPasswordDto: ResetPasswordDto): Promise<UserDto> {

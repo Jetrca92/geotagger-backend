@@ -2,7 +2,9 @@ import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { JwtService } from '@nestjs/jwt'
 import { EnvVars } from 'common/constants/env-vars.constant'
+import { JwtPayloadDto } from 'modules/auth/dto/jwt-payload.dto'
 import { DatabaseService } from 'modules/database/database.service'
+import { UserDto } from 'modules/user/dto/user.dto'
 import * as nodemailer from 'nodemailer'
 
 @Injectable()
@@ -25,19 +27,16 @@ export class EmailService {
     })
   }
 
-  public async sendResetPasswordLink(email: string): Promise<void> {
-    const payload = { email }
+  public async sendResetPasswordLink(user: UserDto): Promise<void> {
+    const payload: JwtPayloadDto = { email: user.email, sub: user.id }
 
-    const token = this.jwtService.sign(payload, {
-      secret: this.configService.get(EnvVars.JWT_SECRET),
-      expiresIn: `${this.configService.get(EnvVars.JWT_SECRET_EXPIRES)}s`,
-    })
+    const token = this.jwtService.sign(payload)
 
     const url = `${this.configService.get(EnvVars.EMAIL_RESET_PASSWORD_URL)}?token=${token}`
     const text = `Hi, \nTo reset your password, click here: ${url}`
 
     return this.sendEmail({
-      to: email,
+      to: user.email,
       subject: 'Reset password',
       text,
     })
