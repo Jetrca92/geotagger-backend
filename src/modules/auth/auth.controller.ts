@@ -6,9 +6,8 @@ import { UserRegisterDto } from './dto/user-register.dto'
 import { GoogleAuthGuard } from './guards/google-auth.guard'
 import { ConfigService } from '@nestjs/config'
 import { EnvVars } from 'common/constants/env-vars.constant'
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { AuthGuard } from '@nestjs/passport'
-import { GetCurrentUserById } from 'utils/get-user-by-id.decorator'
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { ForgotPasswordDto } from './dto/forgot-password.dto'
 
 @ApiTags('auth')
 @Controller('auth')
@@ -49,14 +48,12 @@ export class AuthController {
     return res.redirect(`http://${baseUrl}:3000/dashboard?token=${access_token}`)
   }
 
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Send password reset email' })
   @ApiResponse({ status: 200, description: 'Password reset email sent.' })
   @ApiResponse({ status: 400, description: 'Invalid email address.' })
-  @UseGuards(AuthGuard('jwt'))
   @HttpCode(HttpStatus.OK)
   @Post('forgot-password')
-  async forgotPassword(@GetCurrentUserById() userId: string): Promise<void> {
-    return this.authService.forgotPassword(userId)
+  async forgotPassword(@Body() dto: ForgotPasswordDto): Promise<void> {
+    return this.authService.forgotPassword(dto.email)
   }
 }

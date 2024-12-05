@@ -48,7 +48,6 @@ describe('AppController (e2e)', () => {
   })
 
   describe('Auth', () => {
-    let userToken: string
     afterAll(async () => {
       await databaseService.user.deleteMany()
     })
@@ -76,7 +75,7 @@ describe('AppController (e2e)', () => {
           .send({ email: 'new@user.com', password: 'test123' })
           .expect(201)
 
-        userToken = res.body.access_token
+        return res
       })
 
       it('/auth/login (POST) should return error because of wrong password', () => {
@@ -91,23 +90,19 @@ describe('AppController (e2e)', () => {
       it('/auth/forgot-password (POST) should send password reset mail', async () => {
         return request(app.getHttpServer())
           .post('/auth/forgot-password')
-          .set('Authorization', `Bearer ${userToken}`)
+          .send({ email: 'new@user.com' })
           .expect(200)
           .then(() => {
             expect(mockEmailService.sendResetPasswordLink).toHaveBeenCalledWith('new@user.com')
           })
       })
 
-      it('/auth/forgot-password (POST) should return error if unauthorized', () => {
-        return request(app.getHttpServer()).post('/auth/forgot-password').expect(401)
+      it('/auth/forgot-password (POST) should return error if wrong email', () => {
+        return request(app.getHttpServer()).post('/auth/forgot-password').send({ email: 'wrong@user.com' }).expect(404)
       })
 
-      it('/auth/forgot-password (POST) should return error if user does not exist', async () => {
-        const invalidToken = 'invalidToken123'
-        return request(app.getHttpServer())
-          .post('/auth/forgot-password')
-          .set('Authorization', `Bearer ${invalidToken}`)
-          .expect(401)
+      it('/auth/forgot-password (POST) should return error if invalid dto', async () => {
+        return request(app.getHttpServer()).post('/auth/forgot-password').send({ email: 'wronguser.com' }).expect(400)
       })
     })
   })

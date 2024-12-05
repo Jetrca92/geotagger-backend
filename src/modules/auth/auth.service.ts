@@ -65,11 +65,11 @@ export class AuthService {
     })
   }
 
-  async forgotPassword(id: string): Promise<void> {
-    const user = await this.prisma.user.findUnique({ where: { id } })
+  async forgotPassword(email: string): Promise<void> {
+    const user = await this.prisma.user.findUnique({ where: { email } })
     if (!user) {
-      Logger.warn(`No user found with id: ${id}`)
-      throw new NotFoundException(`No user found for with id: ${id}`)
+      Logger.warn(`No user found with email: ${email}`)
+      throw new NotFoundException(`No user found for with email: ${email}`)
     }
     await this.emailService.sendResetPasswordLink(user.email)
   }
