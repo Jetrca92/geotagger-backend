@@ -6,6 +6,7 @@ import { EmailModule } from './email/email.module'
 import { UserModule } from './user/user.module'
 import { LocationModule } from './location/location.module'
 import { GuessModule } from './guess/guess.module'
+import { LogModule } from './log/log.module'
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { GuessModule } from './guess/guess.module'
     UserModule,
     LocationModule,
     GuessModule,
+    LogModule,
   ],
   controllers: [],
   providers: [],

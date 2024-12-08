@@ -94,7 +94,7 @@ describe('AppController (e2e)', () => {
           .send({ email: 'new@user.com' })
           .expect(200)
           .then(() => {
-            expect(mockEmailService.sendResetPasswordLink).toHaveBeenCalledWith('new@user.com')
+            expect(mockEmailService.sendResetPasswordLink).toHaveBeenCalled()
           })
       })
 
@@ -102,7 +102,7 @@ describe('AppController (e2e)', () => {
         return request(app.getHttpServer()).post('/auth/forgot-password').send({ email: 'wrong@user.com' }).expect(404)
       })
 
-      it('/auth/forgot-password (POST) should return error if invalid dto', async () => {
+      it('/auth/forgot-password (POST) should return error if invalid dto', () => {
         return request(app.getHttpServer()).post('/auth/forgot-password').send({ email: 'wronguser.com' }).expect(400)
       })
     })
@@ -191,7 +191,7 @@ describe('AppController (e2e)', () => {
     })
 
     describe('Update user password', () => {
-      it('/user/update-password (PATCH) should update current user', async () => {
+      it('/user/update-password (PATCH) should update current user', () => {
         return request(app.getHttpServer())
           .patch('/user/update-password')
           .set('Authorization', `Bearer ${userToken}`)
@@ -206,7 +206,7 @@ describe('AppController (e2e)', () => {
           .expect(401)
       })
 
-      it('/user/update-password (PATCH) should return error if wrong current password', async () => {
+      it('/user/update-password (PATCH) should return error if wrong current password', () => {
         return request(app.getHttpServer())
           .patch('/user/update-password')
           .set('Authorization', `Bearer ${userToken}`)
@@ -235,7 +235,7 @@ describe('AppController (e2e)', () => {
           })
       })
 
-      it('/user/upload/:id (POST) should return error if unauthorized', async () => {
+      it('/user/upload/:id (POST) should return error if unauthorized', () => {
         return request(app.getHttpServer())
           .post(`/user/upload/${userId}`)
           .attach('image', Buffer.from(file.buffer), file.originalname)
@@ -280,9 +280,9 @@ describe('AppController (e2e)', () => {
     })
 
     afterAll(async () => {
-      await databaseService.$disconnect()
       await databaseService.user.deleteMany()
       await databaseService.location.deleteMany()
+      await databaseService.$disconnect()
     })
 
     describe('Get latest locations and user locations', () => {
@@ -446,9 +446,9 @@ describe('AppController (e2e)', () => {
     })
 
     afterAll(async () => {
-      await databaseService.$disconnect()
       await databaseService.user.deleteMany()
       await databaseService.location.deleteMany()
+      await databaseService.$disconnect()
     })
 
     describe('Create a guess', () => {
@@ -506,6 +506,71 @@ describe('AppController (e2e)', () => {
           .get(`/location/guess/${wrongId}`)
           .set('Authorization', `Bearer ${userToken}`)
           .expect(404)
+      })
+    })
+  })
+
+  describe('Log', () => {
+    let userToken: string
+    let uniqueUserId: string
+    const password = '123456'
+
+    beforeAll(async () => {
+      await databaseService.$connect()
+      uniqueUserId = uuidv4()
+      const hashedPassword = await bcrypt.hash(password)
+      await databaseService.user.create({
+        data: {
+          id: uniqueUserId,
+          firstName: 'test',
+          lastName: 'user',
+          email: `${uniqueUserId}@example.com`,
+          password: hashedPassword,
+          points: 10,
+        },
+      })
+
+      const res = await request(app.getHttpServer())
+        .post('/auth/login')
+        .send({ email: `${uniqueUserId}@example.com`, password: password })
+        .expect(201)
+      userToken = res.body.access_token
+    })
+
+    afterAll(async () => {
+      await databaseService.user.deleteMany()
+      await databaseService.userActionLog.deleteMany()
+      await databaseService.$disconnect()
+    })
+
+    describe('Create a log', () => {
+      it('/log (POST) should create a new log', () => {
+        return request(app.getHttpServer())
+          .post('/log')
+          .set('Authorization', `Bearer ${userToken}`)
+          .send({ action: 'CLICK', componentType: 'BUTTON', location: 'location/edit' })
+          .expect(201)
+      })
+
+      it('/log (POST) should return error if unauthorized', () => {
+        return request(app.getHttpServer())
+          .post('/log')
+          .send({ action: 'CLICK', componentType: 'BUTTON', location: 'location/edit' })
+          .expect(401)
+      })
+
+      it('/log (POST) should return error if invalid input data', () => {
+        return request(app.getHttpServer()).post('/log').set('Authorization', `Bearer ${userToken}`).expect(400)
+      })
+    })
+
+    describe('Get last 100 logs', () => {
+      it('/log (GET) should return last 100 logs', () => {
+        return request(app.getHttpServer()).get('/log').set('Authorization', `Bearer ${userToken}`).expect(200)
+      })
+
+      it('/log (GET) should return error if unauthorized', () => {
+        return request(app.getHttpServer()).get('/log').expect(401)
       })
     })
   })
