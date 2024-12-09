@@ -34,11 +34,6 @@ export class LogController {
   @UseGuards(AuthGuard('jwt'))
   @Get('')
   async getLogs(): Promise<LogDto[]> {
-    return this.prisma.userActionLog.findMany({
-      orderBy: {
-        createdAt: 'desc',
-      },
-      take: 100,
-    })
+    return this.logService.getLogs()
   }
 }

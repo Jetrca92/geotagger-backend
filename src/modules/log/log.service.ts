@@ -23,6 +23,16 @@ export class LogService {
             connect: { id: userId },
           },
         },
+        include: {
+          user: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              avatarUrl: true,
+            },
+          },
+        },
       })
 
       Logger.log(`Log successfully created for user ${userId}`)
@@ -31,5 +41,31 @@ export class LogService {
       Logger.error(error)
       throw new InternalServerErrorException('Failed to create a log.')
     }
+  }
+
+  async getLogs(): Promise<LogDto[]> {
+    const logs = await this.prisma.userActionLog.findMany({
+      orderBy: {
+        createdAt: 'desc',
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            avatarUrl: true,
+          },
+        },
+      },
+      take: 100,
+    })
+
+    if (logs.length === 0) {
+      Logger.warn('No logs found.')
+      return []
+    }
+
+    return logs
   }
 }

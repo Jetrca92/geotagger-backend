@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-import { IsEmail, IsNumber, IsOptional, IsString, IsUUID } from 'class-validator'
+import { IsBoolean, IsEmail, IsNumber, IsOptional, IsString, IsUUID } from 'class-validator'
 
 export class UserDto {
   @ApiProperty({
@@ -30,4 +30,8 @@ export class UserDto {
   @ApiProperty({ example: 10, description: 'Number of points' })
   @IsNumber()
   points: number
+
+  @ApiProperty({ example: false, description: 'isAdmin boolean' })
+  @IsBoolean()
+  isAdmin: boolean
 }

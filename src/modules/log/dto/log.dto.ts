@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { ComponentType, UserActionType } from '@prisma/client'
 import { IsEnum, IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator'
+import { GuessOwnerDto } from 'modules/guess/dto/guess-owner.dto'
 
 export class LogDto {
   @ApiProperty({
@@ -11,9 +12,11 @@ export class LogDto {
   @IsUUID()
   id: string
 
-  @ApiProperty({ example: '550e8400-e29b-41d4-a716-446655440000', description: 'Owner ID of the user', format: 'uuid' })
-  @IsUUID()
-  userId: string
+  @ApiProperty({
+    type: () => GuessOwnerDto,
+    description: 'Owner details of the log',
+  })
+  user: GuessOwnerDto
 
   @ApiProperty({ example: 'CLICK', description: 'User action' })
   @IsEnum(UserActionType)

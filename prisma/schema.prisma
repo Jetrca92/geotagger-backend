@@ -20,6 +20,7 @@ model User {
   guesses   Guess[]
   locations Location[]
   actions   UserActionLog[]
+  isAdmin   Boolean         @default(false)
 }
 
 model Location {
