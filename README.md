@@ -1,4 +1,4 @@
-# Welcome to Auctionbay backend 👋
+# Welcome to Geotagger backend 👋
 
 ## Table of Contents
 
@@ -7,11 +7,10 @@
 - [Tools](#tools)
 - [Disclaimer](#disclaimer)
 
-# AuctionBay - backend
+# Geotagger - backend
 
 ## Overview
-
-This repository contains the backend services for the Auction Web Application, enabling users to create and manage auction events. It supports user registration, authentication, auction creation with images and details, bid placement and real-time bid tracking.
+This repository contains the backend services for a Geotagging Game Application, enabling users to upload images, mark their locations on a map, and challenge others to guess the exact location. The app calculates the accuracy of guesses based on error distance. It features a point-based system where users earn points for uploading images and spend points to make guesses.
 
 ## Install
 
@@ -33,9 +32,11 @@ npm run test
 
 ## Tools
 
-- Node.js (JavaScript runtime)
-- NestJS (Framework for building efficient, scalable server-side applications)
-- Express (Web application framework for Node.js)
+- Node.js
+- NestJS 
+- Swagger
+- Prisma
+- Amazon S3
 
 ## Disclaimer
 
