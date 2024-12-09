@@ -59,6 +59,9 @@ model UserActionLog {
   newValue      String?
   location      String
   user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([createdAt])
+  @@index([userId])
 }
 
 enum UserActionType {
