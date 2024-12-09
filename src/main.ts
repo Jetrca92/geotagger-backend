@@ -5,8 +5,8 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 
 const initSwagger = (app: INestApplication) => {
   const config = new DocumentBuilder()
-    .setTitle('Guess the location')
-    .setDescription('Guess the location API')
+    .setTitle('Geotagger')
+    .setDescription('Geotagger API')
     .setVersion('1.0')
     .addTag('Guess Location')
     .addBearerAuth()

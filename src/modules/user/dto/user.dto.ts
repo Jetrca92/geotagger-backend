@@ -1,7 +1,15 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-import { IsEmail, IsOptional, IsString, MinLength } from 'class-validator'
+import { IsBoolean, IsEmail, IsNumber, IsOptional, IsString, IsUUID } from 'class-validator'
 
-export class UserRegisterDto {
+export class UserDto {
+  @ApiProperty({
+    example: '550e8400-e29b-41d4-a716-446655440000',
+    description: 'Unique identifier of the user',
+    format: 'uuid',
+  })
+  @IsUUID()
+  id: string
+
   @ApiProperty({ example: 'user@example.com', description: 'Email of the user' })
   @IsEmail()
   email: string
@@ -15,15 +23,15 @@ export class UserRegisterDto {
   lastName: string
 
   @ApiPropertyOptional({ example: 'https://example.com/avatar.jpg', description: 'URL to the users avatar image' })
+  @IsString()
   @IsOptional()
-  @IsString()
-  avatarUrl?: string | null
+  avatarUrl?: string
 
-  @ApiProperty({
-    example: 'password123',
-    description: 'The password for the user account. Must be at least 6 characters long.',
-  })
-  @IsString()
-  @MinLength(6)
-  password: string
+  @ApiProperty({ example: 10, description: 'Number of points' })
+  @IsNumber()
+  points: number
+
+  @ApiProperty({ example: false, description: 'isAdmin boolean' })
+  @IsBoolean()
+  isAdmin: boolean
 }
