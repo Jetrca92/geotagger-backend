@@ -16,7 +16,6 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common'
-import { MapsService } from 'modules/maps/maps.service'
 import { LocationService } from './location.service'
 import { GetCurrentUserById } from 'utils/get-user-by-id.decorator'
 import { CreateLocationDto } from './dto/create-location.dto'
@@ -33,7 +32,6 @@ import { S3Service } from 'modules/s3service/s3service.service'
 @Controller('location')
 export class LocationController {
   constructor(
-    private readonly googleMapsService: MapsService,
     private readonly locationService: LocationService,
     private prisma: DatabaseService,
     private s3Service: S3Service,

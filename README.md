@@ -37,6 +37,7 @@ npm run test
 - Swagger
 - Prisma
 - Amazon S3
+- OpenStreetMap
 
 ## Disclaimer
 
