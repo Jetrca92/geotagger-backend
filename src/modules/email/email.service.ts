@@ -3,7 +3,6 @@ import { ConfigService } from '@nestjs/config'
 import { JwtService } from '@nestjs/jwt'
 import { EnvVars } from 'common/constants/env-vars.constant'
 import { JwtPayloadDto } from 'modules/auth/dto/jwt-payload.dto'
-import { DatabaseService } from 'modules/database/database.service'
 import { UserDto } from 'modules/user/dto/user.dto'
 import * as nodemailer from 'nodemailer'
 
@@ -12,7 +11,6 @@ export class EmailService {
   private nodemailerTransport: nodemailer.Transporter
 
   constructor(
-    private prisma: DatabaseService,
     private jwtService: JwtService,
     private configService: ConfigService,
   ) {
